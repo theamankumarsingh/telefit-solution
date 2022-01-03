@@ -1,10 +1,15 @@
 import os
 import telebot
-import requests
+import requests, json
 
-#NUTRITIONIX_API_KEY = os.environ['NUTRITIONIX_API_KEY']
-API_KEY = os.environ['API_KEY']
-bot = telebot.TeleBot(API_KEY)
+NUTRITION_URL='https://trackapi.nutritionix.com/v2/natural/nutrients'
+EXERCISE_URL='https://trackapi.nutritionix.com/v2/natural/exercise'
+NUTRITIONIX_API_KEY = os.environ['NUTRITIONIX_API_KEY']
+NUTRITIONIX_APP_ID = os.environ['NUTRITIONIX_APP_ID']
+BOT_KEY = os.environ['BOT_KEY']
+
+headers={'Content-Type':'application/json', 'x-app-id':NUTRITIONIX_APP_ID, 'x-app-key':NUTRITIONIX_API_KEY}
+bot = telebot.TeleBot(BOT_KEY)
 botRunning=False
 
 @bot.message_handler(commands=['start', 'hello'])
@@ -22,23 +27,54 @@ def goodbye(message):
 @bot.message_handler(func=lambda message: botRunning, commands=['nutrition'])
 def getNutrition(message):
     bot.reply_to(message, 'Getting nutrition info...')
-    bot.send_message(message.chat.id, message.text[11:])
-    bot.send_message(message.chat.id, 'Nutrition info:')
-    bot.send_message(message.chat.id, 'Calories:')
-    bot.send_message(message.chat.id, 'Fat:')
-    bot.send_message(message.chat.id, 'Carbohydrates:')
-    bot.send_message(message.chat.id, 'Protein:')
+    data=message.text[11:]
+    data_json={
+        'query':data,
+        'timezone':'Asia/Kolkata',
+    }
+    res=requests.post(NUTRITION_URL, json=data_json, headers=headers)
+    if res.status_code!=400:
+        l=len(res.json()['foods'])
+        for i in range(l):
+            reply=''
+            reply+='Food Name: '+res.json()['foods'][i]['food_name']+'\n'
+            reply+='Quantity: '+str(res.json()['foods'][i]['serving_qty'])+' '+res.json()['foods'][i]['serving_unit']+'\n'
+            reply+='Calories: '+str(res.json()['foods'][i]['nf_calories'])+'\n'
+            reply+='Fat: '+str(res.json()['foods'][i]['nf_total_fat'])+'\n'
+            reply+='Carbohydrate: '+str(res.json()['foods'][i]['nf_total_carbohydrate'])+'\n'
+            reply+='Protein: '+str(res.json()['foods'][i]['nf_protein'])+'\n'
+            bot.send_message(message.chat.id, reply)
+    else:
+        bot.send_message(message.chat.id, 'Error!')
 
 @bot.message_handler(func=lambda message: botRunning, commands=['exercise'])
 def getCaloriesBurn(message):
     bot.reply_to(message, 'Estimating calories burned...')
-    bot.send_message(message.chat.id, message.text[9:])
-    bot.send_message(message.chat.id, 'Calories burned:')
+    data=message.text[9:]
+    data_json={
+        'query':data,
+        'gender':'male',
+        'weight_kg':80,
+        'height_cm':175,
+        'age':22,
+    }
+    res=requests.post(EXERCISE_URL, json=data_json, headers=headers)
+    if res.status_code!=400:
+        print(res.json())
+        l=len(res.json()['exercises'])
+        for i in range(l):
+            reply=''
+            reply+='Exercise Name: '+res.json()['exercises'][i]['name']+'\n'
+            reply+='Duration: '+str(res.json()['exercises'][i]['duration_min'])+' minutes\n'
+            reply+='Calories Burned: '+str(res.json()['exercises'][i]['nf_calories'])+'\n'
+            bot.send_message(message.chat.id, reply)
+    else:
+        bot.send_message(message.chat.id, 'Error!')
 
 @bot.message_handler(func=lambda message: botRunning, commands=['report'])
 def getCaloriesBurn(message):
+    data=message.text[7:]
     bot.reply_to(message, 'Generating report...')
-    bot.send_message(message.chat.id, message.text[7:])
     bot.send_message(message.chat.id, 'CSV file:')
 
 @bot.message_handler(func=lambda message: botRunning)
