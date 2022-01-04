@@ -3,6 +3,20 @@
 ## 📌 Introduction
 This is a python telegram bot challenge.
 
+## 🏃‍ Getting Started
+- Fork this repository and then clone it.
+- Create a python virtual environment in the directory:
+  
+  ```python3 -m venv .```
+
+- Install required packages:
+  
+  ```python3 install -r requirements.txt```
+
+- To run the bot (for testing):
+  
+  ```python3 bot.py```
+
 ## 🧱 Stages
   1. Fetching Nutrition Data from the Nutritionix API and displaying it to telegram chatbox.
   2. Fetching Exercise Data from the Nutritionix API and displaying it to telegram chatbox.
@@ -13,6 +27,10 @@ This is a python telegram bot challenge.
 - [Nutritionix API](https://www.nutritionix.com/)
 - [pyTelegramBotAPI](https://pypi.org/project/pyTelegramBotAPI/0.3.0/)
 - [BotFather](https://medium.com/shibinco/create-a-telegram-bot-using-botfather-and-get-the-api-token-900ba00e0f39)
+
+## 📝 Submission Guidelines
+- Checkout to a branch with your name.
+- Make a PR to the main branch.
 
 ## 👀 Live Bot Preview
 - [TeleFit Bot Link](https://t.me/Tele_Fit_Bot)
