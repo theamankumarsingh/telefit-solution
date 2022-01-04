@@ -9,13 +9,13 @@ NUTRITION_URL = 'https://trackapi.nutritionix.com/v2/natural/nutrients'
 EXERCISE_URL = 'https://trackapi.nutritionix.com/v2/natural/exercise'
 NUTRITIONIX_API_KEY = environ['NUTRITIONIX_API_KEY']
 NUTRITIONIX_APP_ID = environ['NUTRITIONIX_APP_ID']
-http_api = environ['http_api']
+HTTP_API = environ['http_api']
 
 headers = {'Content-Type': 'application/json',
            'x-app-id': NUTRITIONIX_APP_ID, 'x-app-key': NUTRITIONIX_API_KEY}
 user = {'name': None, 'gender': None,
         'weight': None, 'height': None, 'age': None}
-bot = telebot.TeleBot(http_api)
+bot = telebot.TeleBot(HTTP_API)
 
 
 @bot.message_handler(commands=['start', 'hello'])
@@ -120,7 +120,6 @@ def getCaloriesBurn(message):
     }
     res = requests.post(EXERCISE_URL, json=data_json, headers=headers)
     if res.status_code != 400:
-        print(res.json())
         l = len(res.json()['exercises'])
         for i in range(l):
             data = [
@@ -147,13 +146,14 @@ def getCaloriesBurn(message):
 def getCaloriesBurn(message):
     bot.reply_to(message, 'Generating report...')
     usr_input = message.text[9:]
-    if (usr_input == "exercise"):
+    usr_input = [x.strip() for x in usr_input.split(',')]
+    if ("exercise" in usr_input):
         doc = open('exercise_records.csv', 'rb')
         bot.send_document(message.chat.id, doc)
-    if (usr_input == "nutrition"):
+    if ("nutrition" in usr_input):
         doc = open('nutrition_records.csv', 'rb')
         bot.send_document(message.chat.id, doc)
-    if (usr_input != "exercise" and usr_input != "nutrition"):
+    if ("exercise" not in usr_input and "nutrition" not in usr_input):
         bot.send_message(message.chat.id, 'Error!')
 
 
