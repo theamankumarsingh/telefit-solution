@@ -1,4 +1,5 @@
 import os
+from os import environ
 import telebot
 import requests
 import json
@@ -6,15 +7,15 @@ import csv
 
 NUTRITION_URL = 'https://trackapi.nutritionix.com/v2/natural/nutrients'
 EXERCISE_URL = 'https://trackapi.nutritionix.com/v2/natural/exercise'
-NUTRITIONIX_API_KEY = os.environ['NUTRITIONIX_API_KEY']
-NUTRITIONIX_APP_ID = os.environ['NUTRITIONIX_APP_ID']
-BOT_KEY = os.environ['BOT_KEY']
+NUTRITIONIX_API_KEY = environ['NUTRITIONIX_API_KEY']
+NUTRITIONIX_APP_ID = environ['NUTRITIONIX_APP_ID']
+http_api = environ['http_api']
 
 headers = {'Content-Type': 'application/json',
            'x-app-id': NUTRITIONIX_APP_ID, 'x-app-key': NUTRITIONIX_API_KEY}
 user = {'name': None, 'gender': None,
         'weight': None, 'height': None, 'age': None}
-bot = telebot.TeleBot(BOT_KEY)
+bot = telebot.TeleBot(http_api)
 
 
 @bot.message_handler(commands=['start', 'hello'])
@@ -47,7 +48,7 @@ def goodbye(message):
 
 @bot.message_handler(func=lambda message: botRunning, commands=['help'])
 def helpProvider(message):
-    bot.reply_to(message, ' 1.0.You can use \"/nutrition Units Quantity-Type Food-Name\" command to get the nutrients of a particular food. For eg: \"/nutrition 1 piece chapati\" \n 2.1 For using the bot to get details about an exercise you need to first set the user data using the command \"/user Name,Gender,Weight,Height,Age\". For eg: \"/user Akshat,Male,70,6,19 \n 2.2 Then you can use the command \"/execise Duration-amount Duration-unit Exercise-name\" to get data about an exercise. For eg: \"/exercise 40 minutes push-ups\" 3.0. You can use the command \"/reports Report-name\" to get the reports in CSV Format. For eg: \"/reports nutrition\" to get nutrition report and \"/reports exercise\" to get exercise reports.')
+    bot.reply_to(message, '1.0.You can use \"/nutrition Units Quantity-Type Food-Name\" command to get the nutrients of a particular food. For eg: \"/nutrition 1 piece chapati\"\n\n2.1 For using the bot to get details about an exercise you need to first set the user data using the command \"/user Name,Gender,Weight,Height,Age\". For eg: \"/user Akshat,Male,70,6,19\n\n2.2 Then you can use the command \"/execise Duration-amount Duration-unit Exercise-name\" to get data about an exercise. For eg: \"/exercise 40 minutes push-ups\"\n\n3.0. You can use the command \"/reports Report-name\" to get the reports in CSV Format. For eg: \"/reports nutrition\" to get nutrition report and \"/reports exercise\" to get exercise reports.\n\n4.0. You can use the command \"/stop\" or the command \"/bye\" to stop the bot.')
 
 
 @bot.message_handler(func=lambda message: botRunning, commands=['user'])
